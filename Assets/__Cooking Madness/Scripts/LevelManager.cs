@@ -9,12 +9,30 @@ using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Zenject;
 
 public class LevelManager : MonoBehaviour
 {
+    [Inject]
+    private LevelUIManager levelUIManager;
+
+    #region Inspector Fired Events
+    //   [System.Serializable]
+    //  public class ScoreChangedEvent : UnityEvent<string> { }
+
+    // public UnityEvent<string> ScoreChangedEvent; 
+    #endregion
+
+
+    //UI Objects Injection 
+    [Header("UI Injected Objects")]
+    public TMPro.TextMeshProUGUI scoreMesh;
+
+    [Header("Timer values")]
     public float cookDuration;// Duration to fill the bar
     public float beForeFireDuration; // Duration to fill the bar
 
+    [Header("Others")]
 
     public GridLayoutGroup customerPanel;
     public GameObject customerPrefab;
@@ -22,7 +40,6 @@ public class LevelManager : MonoBehaviour
     //score
     [field: SerializeField]
     public int platesMaxScore { get; set; }
-    public TMPro.TextMeshProUGUI scoreText;
     [field: SerializeField]
     public int currentPlatesScore { get; set; }
 
@@ -55,9 +72,29 @@ public class LevelManager : MonoBehaviour
     public Sprite grilledMeat; // Assign this in the Inspector
     public Sprite burnedMeat; // Assign this in the Inspector
 
+
+    IEventManager eventManager;
+
+    private void Awake()
+    {
+        Debug.Log("Level  awake has been called");
+        InjectDependencies();
+    }
+ 
+
     private void Start()
     {
         StartCoroutine(CustomerSpawner());
+    }
+
+    public void InjectDependencies()
+    {
+        eventManager = EventManager.Instance;
+        LevelUIManager.Instance.SetEventManager(eventManager);
+        ITextProvider textProvider = new TextMeshProProvider(scoreMesh);
+      //  LevelUIManager.Instance.SetTextProvider(textProvider);
+
+
     }
     public static LevelManager Instance
     {
@@ -163,7 +200,11 @@ public class LevelManager : MonoBehaviour
         if (requiredCustomer != null)
         {
             currentPlatesScore += 1;
-            scoreText.text = $"{currentPlatesScore}/{platesMaxScore}";
+
+            var score = $"{currentPlatesScore}/{platesMaxScore}";
+        //    var scoreChangeEventArg = new ScoreChangnedEventArg { scoreString = score };
+            levelUIManager.SetScoreText(score);
+            //// scoreText.text =;
             requiredCustomer.GiveFoodToCustomer(order);
             if (TableOrders.Contains(order))
             {
@@ -251,3 +292,4 @@ public class LevelManager : MonoBehaviour
     
 
 }
+
