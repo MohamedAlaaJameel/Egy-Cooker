@@ -122,6 +122,7 @@ namespace Zenject.Asteroids
 
         public void Tick()
         {
+          //  Debug.Log("Tick");
             for (int i = 0; i < _asteroids.Count; i++)
             {
                 _asteroids[i].Tick();

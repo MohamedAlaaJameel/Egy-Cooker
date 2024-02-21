@@ -14,7 +14,7 @@ using Zenject;
 public class LevelManager : MonoBehaviour
 {
     [Inject]
-    private LevelUIManager levelUIManager;
+    public LevelUIManager levelUIManager;
 
     #region Inspector Fired Events
     //   [System.Serializable]
@@ -91,8 +91,6 @@ public class LevelManager : MonoBehaviour
     {
         eventManager = EventManager.Instance;
         LevelUIManager.Instance.SetEventManager(eventManager);
-        ITextProvider textProvider = new TextMeshProProvider(scoreMesh);
-      //  LevelUIManager.Instance.SetTextProvider(textProvider);
 
 
     }
