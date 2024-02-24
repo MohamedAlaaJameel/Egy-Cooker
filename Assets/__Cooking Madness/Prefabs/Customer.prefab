@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 2335321520769484545}
   - component: {fileID: 2681767430713699648}
   - component: {fileID: 6935415517248109283}
-  - component: {fileID: 8794085772609495174}
   m_Layer: 5
   m_Name: Customer
   m_TagString: Untagged
@@ -101,15 +100,3 @@ MonoBehaviour:
   m_Spacing: {x: 0, y: 0}
   m_Constraint: 0
   m_ConstraintCount: 2
---- !u!114 &8794085772609495174
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6595321834797988394}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1445a5ba76e8931448ad68553071c270, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
