@@ -14,8 +14,11 @@ public class MeatInstaller : MonoInstaller
 
     public override void InstallBindings()
     {
+        SignalBusInstaller.Install(Container);
+        Container.DeclareSignal<int>();
+        Container.BindSignal<int>().ToMethod<Oven>(ov => ov.DespawnClock).FromResolve();
         Container.BindFactory<Meat, Meat.Factory>().FromComponentInNewPrefab(MeatPrefab).WithGameObjectName("Raw Meat");
-        Container.BindFactory<Clock, Clock.Factory>().FromComponentInNewPrefab(ClockPrefab).WithGameObjectName("Clock");
+        Container.BindMemoryPool<Clock, Clock.Pool>().WithInitialSize(4).FromComponentInNewPrefab(ClockPrefab).WithGameObjectName("Clock");
         Container.Bind<Oven>().FromInstance(oven);
         Container.Bind<Trash>().FromInstance(trash);
         Container.Bind<MyTable>().FromInstance(table);

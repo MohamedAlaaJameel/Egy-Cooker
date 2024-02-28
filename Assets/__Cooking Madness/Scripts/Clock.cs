@@ -3,14 +3,18 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
 public class Clock : MonoBehaviour, IChangeFoodStates
 {
+   
+    [Inject]
+    SignalBus _signalBus;
     public GameObject fireClock;
     public GameObject normalClock;
     public Image loadingBar;
-
     private Meat _meet;
+    public int ID { get => GetInstanceID(); }
 
     public void SetFood(Meat meat)
     {
@@ -18,7 +22,7 @@ public class Clock : MonoBehaviour, IChangeFoodStates
         transform.SetParent(meat.transform);
     }
 
-    private void Start()
+    private void StartClock()
     {
      
         StartCoroutine(FillBar());
@@ -61,6 +65,13 @@ public class Clock : MonoBehaviour, IChangeFoodStates
         ChangeFoodState(new BurnedState(), _meet);
 
         loadingBar.fillAmount = 1.0f;
+        StopClock();
+    }
+
+    public void StopClock()
+    {
+        StopAllCoroutines(); // Example of stopping coroutines
+        _signalBus.Fire(ID);
         HideClock();
     }
     public void HideClock()
@@ -68,20 +79,33 @@ public class Clock : MonoBehaviour, IChangeFoodStates
         gameObject.SetActive(false);
     }
 
-    public void StopClock()
-    {
-        StopAllCoroutines(); // Example of stopping coroutines
-        HideClock();
-    }
-
-
 
     public void ChangeFoodState(IFoodState foodState, Meat food)
     {
         food.TransitionTo(foodState);
     }
 
- 
+    public void InitClockData()
+    {
+        loadingBar.fillAmount = 0.0f;
+        gameObject.SetActive(true);
+        loadingBar.color = Color.green;
+        normalClock.SetActive(true);
+        fireClock.SetActive(false);
 
-    public class Factory : PlaceholderFactory<Clock> { }
+
+
+    }
+
+    public class Pool : MemoryPool<Meat, Clock> {
+        
+
+        protected override void Reinitialize(Meat food, Clock clock)
+        {
+            clock.InitClockData();
+            clock.SetFood(food);
+            clock.StartClock();
+        }
+  
+    }
 }
