@@ -98,8 +98,6 @@ public class Clock : MonoBehaviour, IChangeFoodStates
     }
 
     public class Pool : MemoryPool<Meat, Clock> {
-        
-
         protected override void Reinitialize(Meat food, Clock clock)
         {
             clock.InitClockData();
