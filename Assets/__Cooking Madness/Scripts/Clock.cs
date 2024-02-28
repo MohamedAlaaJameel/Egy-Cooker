@@ -4,42 +4,42 @@ using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 
-public class Clock : MonoBehaviour, IClockControl
+public class Clock : MonoBehaviour, IChangeFoodStates
 {
     public GameObject fireClock;
     public GameObject normalClock;
     public Image loadingBar;
 
-    public int cookDuration;
-    public int beForeFireDuration;
-    [Inject]
-    SignalBus _singnalBus;
-    IMeatStateChanger _meatStateChanger;
+    private Meat _meet;
+
+    public void SetFood(Meat meat)
+    {
+        _meet = meat;
+        transform.SetParent(meat.transform);
+    }
+
     private void Start()
     {
      
         StartCoroutine(FillBar());
 
     }
-    public void SetMeatStateChanger(IMeatStateChanger meatStateChanger)
-    {
-        _meatStateChanger = meatStateChanger;
-    }
+  
     IEnumerator FillBar()
     {
         float startTime = Time.time;
-        float endNormalCock = startTime + cookDuration;
+        float endNormalCock = startTime + _meet.GrillDuration;
         float elapsedTime = 0f;
 
         while (Time.time <= endNormalCock)
         {
             elapsedTime = Time.time - startTime;
-            float fill = Mathf.Clamp01(elapsedTime / cookDuration);
+            float fill = Mathf.Clamp01(elapsedTime / _meet.GrillDuration);
             loadingBar.fillAmount = fill;
             yield return null;
         }
         startTime = Time.time;
-        float fireTime = startTime + beForeFireDuration;
+        float fireTime = startTime + _meet.BurnDuration;
 
         // Ensure it's fully filled if there's any discrepancy
         loadingBar.fillAmount = 0.0f;
@@ -48,17 +48,17 @@ public class Clock : MonoBehaviour, IClockControl
         fireClock.SetActive(true);
 
         //  ChangeToGrilled();
-        _meatStateChanger.ChangeToGrilled();
+        ChangeFoodState(new GrilledState(), _meet);
 
         while (Time.time <= fireTime)
         {
             elapsedTime = Time.time - startTime;
-            float fill = Mathf.Clamp01(elapsedTime / beForeFireDuration);
+            float fill = Mathf.Clamp01(elapsedTime / _meet.BurnDuration);
             loadingBar.fillAmount = fill;
             yield return null;
         }
         //  ChangeToBurned();
-        _meatStateChanger.ChangeToBurned();
+        ChangeFoodState(new BurnedState(), _meet);
 
         loadingBar.fillAmount = 1.0f;
         HideClock();
@@ -73,6 +73,15 @@ public class Clock : MonoBehaviour, IClockControl
         StopAllCoroutines(); // Example of stopping coroutines
         HideClock();
     }
+
+
+
+    public void ChangeFoodState(IFoodState foodState, Meat food)
+    {
+        food.TransitionTo(foodState);
+    }
+
+ 
 
     public class Factory : PlaceholderFactory<Clock> { }
 }

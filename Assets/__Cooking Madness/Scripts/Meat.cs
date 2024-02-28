@@ -1,68 +1,68 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
-public class Meat : MonoBehaviour, IMeatStateChanger
+public interface IInterActableFood
+{
+    void ClearEvents();
+    void SetEvents();
+}
+public interface _2DFood:IInterActableFood
+{
+    void SetShape(Sprite shape);
+}
+
+public class Meat : MonoBehaviour, _2DFood
 {
     public Sprite grilledMeat;
     public Sprite burnedMeat;
-
-    [Inject]
-    SignalBus _signals;
-    [Inject]
-    Table _table;
-
-    Image image;
+    private Image image;
     public Button button { get; set; }
-    private void Start()
+    [field:SerializeField]
+    public int GrillDuration { get; set; }
+    [field: SerializeField]
+    public int BurnDuration { get; set; }
+ //private IFoodState _state;
+    private Clock _foodclock;
+   public  ICommand sendToOvenCommand { get; set; }
+   public  ICommand sendToTableCommand { get; set; }
+   public  ICommand sendToTrashCommand { get; set; }
+
+    public void Start() //  i will call start maybe better .. 
     {
-        image= GetComponent<Image>();
+        image = GetComponent<Image>();
         button = GetComponent<Button>();
+        var st = new RawState();
+        TransitionTo(st);
     }
-
-    private IClockControl _clockControl;
-
-    public void SetClockControl(IClockControl clockControl)
+    public void SetShape(Sprite shape)
     {
-        _clockControl = clockControl;
+        image.sprite = shape;
     }
-    public void ChangeToGrilled()
+    public void TransitionTo(IFoodState state)
     {
-        image.sprite = grilledMeat;
-        var meatBTN = GetComponent<Button>();
-        meatBTN.RemoveAllListenersSafe();
-        meatBTN.onClick.AddListener(() => SendToTableFunc());
+        ClearEvents();
+        state.Handle(this);
+        Debug.Log($"Transitioning to {state.GetType().Name}");
 
     }
-
-    public void ChangeToBurned()
+    public void ClearEvents()
     {
-        var meatBTN = GetComponent<Button>();
-        meatBTN.RemoveAllListenersSafe();
-
-        GetComponent<Image>().sprite = burnedMeat;
-         meatBTN.onClick.AddListener(() => DropMeat());    
+        button.RemoveAllListenersSafe();
+    }
+    public void AddBTNCommand(ICommand command)
+    {
+        button.onClick.AddListener(() => command.Execute(this));
     }
 
-    private void DropMeat()
+    public void SetEvents()
     {
-        DestroyImmediate(this.gameObject);
-    }
-
-    public void SendToTableFunc()//binded to button
-    {
-        if (_table.IsAvailable)
-        {
-            _clockControl?.StopClock();
-            button.RemoveAllListenersSafe();
-            //button.onClick.AddListener(() => SendToCustomerFunc()); 
-
-            _table.AddToTable(this);
-        }
+      //  throw new NotImplementedException();
     }
 
     public class Factory : PlaceholderFactory<Meat> { }

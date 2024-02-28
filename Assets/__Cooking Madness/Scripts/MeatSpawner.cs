@@ -9,14 +9,23 @@ public class MeatSpawner :MonoBehaviour
     [Inject]
     Oven oven;
     [Inject]
-    SignalBus _signalBus;
+    MyTable table;
+    [Inject]
+    Trash trash;
+
     public void SpawnMeat()//binded to button
     {
         if (oven.IsAvailable)
         {
-            var meat = meatfactory.Create();
-            var onRawMeatSignal = new OnRawMeatCreationSignal { meatGameObject = meat };
-            _signalBus.Fire(onRawMeatSignal);
+            var meat= meatfactory.Create();
+            ICommand sendToOvenCommand = new SendToOvenCommand(oven);
+            ICommand sendToTableCommand = new SendToTableCommand(table);
+            ICommand sendToTrashCommand = new SendToTrashCommand(trash);
+            meat.sendToOvenCommand=sendToOvenCommand;
+            meat.sendToTableCommand = sendToTableCommand;
+            meat.sendToTrashCommand = sendToTrashCommand;
+
         }
     }
+
 }
