@@ -18,6 +18,7 @@ public class MeatSpawner :MonoBehaviour
         if (oven.IsAvailable)
         {
             var meat= meatfactory.Create();
+
             ICommand sendToOvenCommand = new SendToOvenCommand(oven);
             ICommand sendToTableCommand = new SendToTableCommand(table);
             ICommand sendToTrashCommand = new SendToTrashCommand(trash);

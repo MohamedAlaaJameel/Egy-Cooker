@@ -6,7 +6,6 @@ using UnityEngine;
 using Zenject;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
-public struct clockDoneSignal{}
 public class Oven : MonoBehaviour
 {
     [Inject]

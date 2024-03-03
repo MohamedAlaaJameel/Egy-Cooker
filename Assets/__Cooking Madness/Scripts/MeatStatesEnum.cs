@@ -11,6 +11,7 @@ public enum MeatStates
    raw,girlled,burned
 }
 
+#region Command design pattern
 public interface ICommand
 {
     void Execute(Meat food);
@@ -30,11 +31,11 @@ public class SendToTableCommand : ICommand
         {
             return;
         }
-     
+
         var clock = food.GetComponentInChildren<Clock>();
-        if (clock!=null)
+        if (clock != null)
         {
-          clock.StopClock();
+            clock.StopClock();
         }
         _table.AddToTable(food);
     }
@@ -67,13 +68,16 @@ public class SendToTrashCommand : ICommand
     }
 }
 
+#endregion
 
 
+
+
+#region State design pattern
 public interface IChangeFoodStates
 {
-    public void ChangeFoodState(IFoodState gameObject,Meat food);//todo Ifood
+    public void ChangeFoodState(IFoodState gameObject, Meat food);//todo Ifood
 }
-
 
 public interface IFoodState
 {
@@ -87,23 +91,23 @@ public class RawState : IFoodState
     {
         Debug.Log("Meat is raw.");
         food.sendToOvenCommand.Execute(food);
-       // food.AddBTNCommand(food.sendToOvenCommand);
+        // food.AddBTNCommand(food.sendToOvenCommand);
 
 
         //  food.currentCommand.Execute(food);
-     }
+    }
 }
 public class GrilledState : IFoodState
 {
-   
+
     public void Handle(Meat food)
     {
         Debug.Log("Meat is grilled.");
-         
+
         food.AddBTNCommand(food.sendToTableCommand);
 
         food.SetShape(food.grilledMeat);
- 
+
     }
 }
 public class BurnedState : IFoodState
@@ -115,5 +119,5 @@ public class BurnedState : IFoodState
 
         Debug.Log("Meat is burned.");
     }
-}
- 
+} 
+#endregion

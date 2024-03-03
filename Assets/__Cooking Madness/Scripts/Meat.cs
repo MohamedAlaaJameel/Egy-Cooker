@@ -7,17 +7,13 @@ using UnityEngine.UI;
 using Zenject;
 using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
 
-public interface IInterActableFood
-{
-    void ClearEvents();
-    void SetEvents();
-}
-public interface _2DFood:IInterActableFood
+
+public interface _2DFood
 {
     void SetShape(Sprite shape);
 }
 
-public class Meat : MonoBehaviour, _2DFood
+public class Meat : MonoBehaviour,  _2DFood
 {
     public Sprite grilledMeat;
     public Sprite burnedMeat;
@@ -32,6 +28,7 @@ public class Meat : MonoBehaviour, _2DFood
    public  ICommand sendToOvenCommand { get; set; }
    public  ICommand sendToTableCommand { get; set; }
    public  ICommand sendToTrashCommand { get; set; }
+    List<Condiment> condiments = new List<Condiment>();
 
     public void Start() //  i will call start maybe better .. 
     {
@@ -60,9 +57,10 @@ public class Meat : MonoBehaviour, _2DFood
         button.onClick.AddListener(() => command.Execute(this));
     }
 
-    public void SetEvents()
+    public bool canAddCondiment { get; set; }
+    public void AddCondiment(Condiment condiment)
     {
-      //  throw new NotImplementedException();
+        condiment.transform.SetParent(this.transform);
     }
 
     public class Factory : PlaceholderFactory<Meat> { }
